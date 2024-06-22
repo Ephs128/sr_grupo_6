@@ -3,3 +3,13 @@ tensorflow
 scikit learn
 matplotlib
 soounddevice
+
+si numpy da error, lo bajan a una version inferior a 2
+
+si segmenta demasiado entonces subir la sensibilidad
+si hay sonidos vacios en el audio entonces bajar la sensibilidad
+
+la sensibilidad esta en el archivo RV - constants - "THRESHOLD"
+
+el audio grabado con el grabador es grabado_pre_pro.wav
+la direccion es RV - grabado - grabado_pre_pro.wav
