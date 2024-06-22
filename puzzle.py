@@ -2,6 +2,8 @@ from tkinter import Frame, Label, CENTER, Button, EW, PhotoImage, Spinbox, Strin
 import random
 import logic
 import constants as c
+from RV.RVRNN import Reconocedor
+from RV.conversor.convertidor import crear_data_set
 
 def gen():
     return random.randint(0, c.GRID_LEN - 1)
@@ -10,9 +12,11 @@ class GameGrid(Frame):
     def __init__(self):
         Frame.__init__(self)
 
+        crear_data_set()
+        self.__rec = Reconocedor()
+
         self.grid()
         self.master.title('2048')
-       
         self.microphone_icon = PhotoImage(file = "resources/mic.png")
 
         self.grid_cells = []
@@ -26,7 +30,8 @@ class GameGrid(Frame):
     def init_grid(self):
         background = Frame(self, bg=c.BACKGROUND_COLOR_GAME,width=c.SIZE, height=c.SIZE)
         background.grid()
-        
+
+
         for i in range(c.GRID_LEN):
             grid_row = []
             for j in range(c.GRID_LEN):
@@ -63,6 +68,7 @@ class GameGrid(Frame):
             bg="white",
             justify="left",
             font=c.FONT,
+
             )
         self.input_msg.grid(
             row=i,
@@ -70,7 +76,7 @@ class GameGrid(Frame):
             columnspan=3,
             sticky=EW,
             padx=c.GRID_PADDING,
-            pady=c.GRID_PADDING
+            pady=c.GRID_PADDING,
         )
 
         # Adding microphone
@@ -90,6 +96,24 @@ class GameGrid(Frame):
             pady=c.GRID_PADDING,
             sticky=EW
         )
+        # error label
+        self.error_label = Label(
+            master=background,
+            text="",
+            bg=c.BACKGROUND_COLOR_GAME,
+            foreground="red",
+            justify="left",
+            font=("Verdana", 20, "bold"),
+            wraplength=500
+        )
+        self.error_label.grid(
+            row=i + 1,
+            column=0,
+            columnspan=3,
+            sticky=EW,
+            padx=c.GRID_PADDING,
+            pady=c.GRID_PADDING
+        )
         # Adding spinner 
         my_var= StringVar(background)
         my_var.set("22")
@@ -103,14 +127,21 @@ class GameGrid(Frame):
 
         
     def btn_event(self):
+        input1 = ""
         self.mic_btn.configure(state="disabled")
         self.input_msg.configure(text="esperando...", background="#33b5e5")
         #########################
-        input1 = input()######### <= llamar al reconocedor aquí
-        #########################
-        self.execute_voice_command(input1)
-        self.input_msg.configure(text=input1)
+        error = ""
+        try:
+            input1 = self.__rec.reconocer_voz(int(self.sensibility.get()))
+            self.execute_voice_command(input1)
+            self.input_msg.configure(text=input1)
+        except IndexError as e:
+            self.error_label.configure(text=e)
+            self.input_msg.configure(text="Comando Invalido")
         self.mic_btn.configure(state="normal", bg="green")
+        #########################
+
 
 
     def update_grid_cells(self):
@@ -128,7 +159,7 @@ class GameGrid(Frame):
         self.update_idletasks()
 
     def execute_voice_command(self, voice_command):
-        tokens = voice_command.split()
+        tokens = voice_command
         if len(tokens) <= 2:
             first_command = tokens[0]
             if first_command in c.VOICE_END:
@@ -181,5 +212,3 @@ class GameGrid(Frame):
         while self.matrix[index[0]][index[1]] != 0:
             index = (gen(), gen())
         self.matrix[index[0]][index[1]] = 2
-
-game = GameGrid()
