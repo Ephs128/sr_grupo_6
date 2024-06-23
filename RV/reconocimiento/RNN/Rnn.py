@@ -14,7 +14,8 @@ class RnnRecognizer(object):
 
     TRADUCTOR_ACCION = {
         0: "mover",
-        1: "empujar"
+        1: "empujar",
+        2: "atras"
     }
 
     def __init__(self, ruta_datos_dir, ruta_datos_acc):

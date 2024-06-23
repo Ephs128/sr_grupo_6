@@ -127,11 +127,9 @@ class GameGrid(Frame):
 
         
     def btn_event(self):
-        input1 = ""
         self.mic_btn.configure(state="disabled")
         self.input_msg.configure(text="esperando...", background="#33b5e5")
         #########################
-        error = ""
         try:
             input1 = self.__rec.reconocer_voz(int(self.sensibility.get()))
             self.execute_voice_command(input1)
@@ -175,12 +173,16 @@ class GameGrid(Frame):
                 if len(tokens) == 2:
                     second_command = tokens[1]
                     if second_command in c.VOICE_UP:
+                        self.history_matrixs.append(self.matrix)
                         self.execute_movement(logic.up)
                     elif second_command in c.VOICE_DOWN:
+                        self.history_matrixs.append(self.matrix)
                         self.execute_movement(logic.down)
                     elif second_command in c.VOICE_RIGHT:
+                        self.history_matrixs.append(self.matrix)
                         self.execute_movement(logic.right)
                     elif second_command in c.VOICE_LEFT:
+                        self.history_matrixs.append(self.matrix)
                         self.execute_movement(logic.left)
                     else:
                         self.input_msg.configure(background="#C91432")
@@ -196,7 +198,6 @@ class GameGrid(Frame):
             self.input_msg.configure(background="#138636")
             self.matrix = logic.add_two(self.matrix)
             # record last move
-            self.history_matrixs.append(self.matrix)
             self.update_grid_cells()
             if logic.game_state(self.matrix) == 'win':
                 self.grid_cells[1][1].configure(text="You", bg=c.BACKGROUND_COLOR_CELL_EMPTY)
